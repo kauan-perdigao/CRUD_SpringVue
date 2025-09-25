@@ -35,5 +35,36 @@ Inclui autenticação com **cadastro/login de usuários (JWT)** e proteção de 
 
 ---
 
-## 📂 Estrutura
+## ▶️ Como rodar
+
+### 1. Backend (Spring Boot)
+
+**Pré-requisitos:**
+- Java 17+
+- Maven
+- Banco configurado (por padrão H2 em memória) PostgreSQL
+
+**Execução:**
+```bash
+cd spring_back
+./mvnw spring-boot:run
+```
+
+### 1. Frontend (Vue)
+
+**Pré-requisitos:**
+- Vue 3
+- Vuetify 3
+- TypeScript
+- Vite
+
+**Execução:**
+```bash
+cd vue_front
+npm run dev
+```
+
+
+
+
 
