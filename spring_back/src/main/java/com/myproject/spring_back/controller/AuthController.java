@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController @RequestMapping("/auth")
-@CrossOrigin(origins = {"http://localhost:5173"}) // ajuste se separa front
+@CrossOrigin(origins = {"http://localhost:5173"})
 public class AuthController {
   record RegisterRequest(@NotBlank String name, @Email String email, @NotBlank String password){}
   record LoginRequest(@Email String email, @NotBlank String password){}

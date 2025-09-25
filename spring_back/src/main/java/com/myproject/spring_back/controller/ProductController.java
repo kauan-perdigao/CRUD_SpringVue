@@ -46,11 +46,6 @@ public class ProductController {
                     .body("Nome do produto é obrigatório");
         }
 
-        /*if (productService.existsByName(produto.getName())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Já existe um produto com esse nome");
-        }*/
-
         if (produto.getCategory() != null && produto.getCategory().getId() != null) {
             if (!categoryService.existsById(produto.getCategory().getId())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
