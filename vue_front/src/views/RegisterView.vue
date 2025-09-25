@@ -29,7 +29,7 @@ async function doRegister() {
   try {
     err.value = null
     await register(name.value, email.value, password.value)
-    router.push('/produtos')
+    router.push('/home')
   } catch (e: any) {
     err.value = e?.response?.data || 'Falha no cadastro'
   }

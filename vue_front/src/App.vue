@@ -6,24 +6,27 @@ import { isAuthenticated, logout } from '@/services/auth'
 const route = useRoute()
 const router = useRouter()
 
+const isAuthPage = computed(() => route.path === '/login' || route.path === '/register')
+const auth = computed(() => isAuthenticated())
+
 const menuEntries = computed(() => {
+  if (isAuthPage.value) return []
   if (route.path.startsWith('/produtos')) {
     return [
-      { title: 'Início', icon: 'mdi-home', to: '/' },
+      { title: 'Início', icon: 'mdi-home', to: '/home' },
       { title: 'Categorias', icon: 'mdi-shape', to: '/categorias' },
     ]
   }
   if (route.path.startsWith('/categorias')) {
     return [
-      { title: 'Início', icon: 'mdi-home', to: '/' },
+      { title: 'Início', icon: 'mdi-home', to: '/home' },
       { title: 'Produtos', icon: 'mdi-package-variant', to: '/produtos' },
     ]
   }
   return []
 })
 
-const showMenu = computed(() => menuEntries.value.length > 0)
-const auth = computed(() => isAuthenticated())
+const showMenu = computed(() => !isAuthPage.value && menuEntries.value.length > 0)
 
 function doLogout() {
   logout()
@@ -58,7 +61,7 @@ function doLogout() {
       <v-spacer />
 
       <v-btn
-        v-if="auth"
+        v-if="auth && !isAuthPage"
         variant="text"
         color="white"
         @click="doLogout"
