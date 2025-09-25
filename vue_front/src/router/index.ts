@@ -1,9 +1,19 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+import { isAuthenticated } from '@/services/auth'
 
-const routes: RouteRecordRaw[] = [
-  { path: '/', component: () => import('@/views/Home.vue'), meta: { title: 'Início', icon: 'mdi-home-outline' } },
-  { path: '/produtos', component: () => import('@/views/ProdutosView.vue'), meta: { title: 'Produtos', icon: 'mdi-package-variant' } },
-  { path: '/categorias', component: () => import('@/views/CategoriasView.vue'), meta: { title: 'Categorias', icon: 'mdi-shape' } },
+const routes = [
+  { path: '/', component: () => import('@/views/Home.vue') },
+  { path: '/login', component: () => import('@/views/LoginView.vue') },
+  { path: '/register', component: () => import('@/views/RegisterView.vue') },
+  { path: '/produtos', component: () => import('@/views/ProdutosView.vue'), meta: { requiresAuth: true } },
+  { path: '/categorias', component: () => import('@/views/CategoriasView.vue'), meta: { requiresAuth: true } },
 ]
 
-export default createRouter({ history: createWebHistory(), routes })
+const router = createRouter({ history: createWebHistory(), routes })
+
+router.beforeEach((to) => {
+  if (to.meta?.requiresAuth && !isAuthenticated()) return '/login'
+  return true
+})
+
+export default router
