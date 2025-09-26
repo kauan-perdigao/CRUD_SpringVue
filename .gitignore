@@ -1,2 +1,30 @@
 # Configurações do editor VS Code
 .vscode/
+
+# Spring Boot - Arquivos de configuração sensíveis
+spring_back/src/main/resources/application.properties
+spring_back/src/main/resources/application-*.properties
+spring_back/.env
+spring_back/.env.*
+!spring_back/.env.example
+
+# Vue.js - Arquivos de ambiente
+vue_front/.env
+vue_front/.env.local
+vue_front/.env.production
+!vue_front/.env.example
+
+# Dependências e builds
+spring_back/target/
+vue_front/node_modules/
+vue_front/dist/
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db

@@ -28,6 +28,52 @@ Um CRUD completo para gerenciar **Produtos** e **Categorias**, com **backend em 
 - 📦 CRUD de **Produtos**
 - 🗂️ CRUD de **Categorias**
 - 🔒 Proteção de rotas (somente usuários autenticados acessam o CRUD)
+
+---
+
+## 🔧 Configuração Inicial
+
+### 1. Backend (Spring Boot)
+
+```bash
+cd spring_back
+
+# Configure o banco de dados
+cp src/main/resources/application.properties.example src/main/resources/application.properties
+# Edite o application.properties com suas configurações de banco
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o .env com uma chave JWT forte
+
+# Execute
+mvn spring-boot:run
+```
+
+### 2. Frontend (Vue.js)
+
+```bash
+cd vue_front
+
+# Instale as dependências
+npm install
+
+# Execute em modo desenvolvimento
+npm run dev
+```
+
+---
+
+## 🔐 Segurança
+
+### ⚠️ IMPORTANTE: Arquivos NÃO versionados
+- `spring_back/src/main/resources/application.properties` - Configurações de banco
+- `spring_back/.env` - Chave JWT e variáveis sensíveis
+- `vue_front/.env` - Configurações do frontend
+
+### ✅ Arquivos de exemplo (versionados)
+- `spring_back/src/main/resources/application.properties.example`
+- `spring_back/.env.example`
 - 🎨 Interface responsiva com Vuetify
 - 🖼️ Ícone (favicon) personalizado
 - ⚡ API REST integrada

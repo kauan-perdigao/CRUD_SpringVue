@@ -1,0 +1,20 @@
+# Exemplo de configuração do Spring Boot
+# Copie este arquivo para application.properties e configure com valores reais
+
+# Server Configuration
+server.port=8080
+
+# Database Configuration - PostgreSQL
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# CORS Configuration (ajuste conforme necessário)
+# cors.allowed-origins=http://localhost:5173,http://localhost:3000
