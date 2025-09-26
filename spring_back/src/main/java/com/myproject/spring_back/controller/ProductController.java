@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/produtos")
 public class ProductController {
@@ -24,8 +22,11 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> listarTodos() {
-        return ResponseEntity.ok(productService.findAllWithCategory());
+    public ResponseEntity<?> listar(@RequestParam(value = "q", required = false) String q) {
+        if (q == null || q.isBlank()) {
+            return ResponseEntity.ok(productService.findAllWithCategory());
+        }
+        return ResponseEntity.ok(productService.searchByName(q));
     }
 
     @PostMapping
@@ -45,11 +46,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Nome do produto é obrigatório");
         }
-
-        /*if (productService.existsByName(produto.getName())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Já existe um produto com esse nome");
-        }*/
 
         if (produto.getCategory() != null && produto.getCategory().getId() != null) {
             if (!categoryService.existsById(produto.getCategory().getId())) {

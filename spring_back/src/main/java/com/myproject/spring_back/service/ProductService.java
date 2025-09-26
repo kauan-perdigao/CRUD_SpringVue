@@ -4,7 +4,6 @@ import com.myproject.spring_back.model.Product;
 import com.myproject.spring_back.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +55,10 @@ public class ProductService {
 
     public boolean existsByNameAndCategoryIdAndIdNot(String name, Long categoryId, Long id) {
         return productRepository.existsByNameAndCategoryIdAndIdNot(name, categoryId, id);
+    }
+
+    public List<Product> searchByName(String q) {
+        return productRepository.findByNameContainingIgnoreCase(q);
     }
     
 }

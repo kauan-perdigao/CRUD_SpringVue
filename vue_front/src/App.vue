@@ -1,16 +1,10 @@
 <script lang="ts" setup>
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { computed } from 'vue'
-import { isAuthenticated, logout } from '@/services/auth'
 
 const route = useRoute()
-const router = useRouter()
-
-const isAuthPage = computed(() => route.path === '/login' || route.path === '/register')
-const auth = computed(() => isAuthenticated())
 
 const menuEntries = computed(() => {
-  if (isAuthPage.value) return []
   if (route.path.startsWith('/produtos')) {
     return [
       { title: 'Início', icon: 'mdi-home', to: '/home' },
@@ -26,12 +20,7 @@ const menuEntries = computed(() => {
   return []
 })
 
-const showMenu = computed(() => !isAuthPage.value && menuEntries.value.length > 0)
-
-function doLogout() {
-  logout()
-  router.push('/login')
-}
+const showMenu = computed(() => menuEntries.value.length > 0)
 </script>
 
 <template>
@@ -59,16 +48,6 @@ function doLogout() {
       <v-app-bar-title>Gerenciador de Produtos Domésticos</v-app-bar-title>
 
       <v-spacer />
-
-      <v-btn
-        v-if="auth && !isAuthPage"
-        variant="text"
-        color="white"
-        @click="doLogout"
-      >
-        <v-icon start>mdi-logout</v-icon>
-        Sair
-      </v-btn>
     </v-app-bar>
 
     <v-main>

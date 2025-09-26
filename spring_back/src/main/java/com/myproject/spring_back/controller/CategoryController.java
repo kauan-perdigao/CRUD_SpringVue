@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/categorias")
 public class CategoryController {
@@ -20,9 +18,11 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Category>> listarTodos() {
-        List<Category> categorias = categoryService.findAll();
-        return ResponseEntity.ok(categorias);
+    public ResponseEntity<?> listar(@RequestParam(value = "q", required = false) String q) {
+        if (q == null || q.isBlank()) {
+            return ResponseEntity.ok(categoryService.findAll());
+        }
+        return ResponseEntity.ok(categoryService.searchByName(q));
     }
 
     @PostMapping

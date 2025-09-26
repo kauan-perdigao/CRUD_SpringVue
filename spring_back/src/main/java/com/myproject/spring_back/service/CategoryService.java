@@ -41,7 +41,6 @@ public class CategoryService {
             product.setCategory(null);
         }
         productRepository.saveAll(productsToUpdate);
-
         categoryRepository.deleteById(id);
     }
     
@@ -60,4 +59,9 @@ public class CategoryService {
     public Optional<Category> findByName(String name) {
         return categoryRepository.findByName(name);
     }
+
+    public List<Category> searchByName(String q) {
+        return categoryRepository.findByNameContainingIgnoreCase(q);
+    }
+
 }
