@@ -1,7 +1,6 @@
 # 🍽️ Gerenciador de Produtos Domésticos
 
 Um CRUD completo para gerenciar **Produtos** e **Categorias**, com **backend em Spring Boot** e **frontend em Vue 3 + Vite + TypeScript + Vuetify**.  
-Inclui autenticação com **cadastro/login de usuários (JWT)** e proteção de rotas.
 
 ---
 
