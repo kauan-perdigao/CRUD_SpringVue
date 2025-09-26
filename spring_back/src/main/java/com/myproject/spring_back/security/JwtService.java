@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Service
 public class JwtService {
-  // gere um segredo forte e guarde em variável de ambiente
   private final Key key = Keys.hmacShaKeyFor(
       System.getenv().getOrDefault("JWT_SECRET",
       "xb6634ntrd67nt47cty78bn65c+-*4-t").getBytes()
