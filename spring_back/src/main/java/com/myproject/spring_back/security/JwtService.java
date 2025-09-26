@@ -11,18 +11,11 @@ import java.util.Map;
 
 @Service
 public class JwtService {
-  private final Key key;
-  
-  public JwtService() {
-    String secret = System.getenv("JWT_SECRET");
-    if (secret == null || secret.trim().isEmpty()) {
-      throw new IllegalStateException(
-        "JWT_SECRET environment variable is required. " +
-        "Please set it with a strong secret key (minimum 32 characters)."
-      );
-    }
-    this.key = Keys.hmacShaKeyFor(secret.getBytes());
-  }
+  // gere um segredo forte e guarde em variável de ambiente
+  private final Key key = Keys.hmacShaKeyFor(
+      System.getenv().getOrDefault("JWT_SECRET",
+      "xb6634ntrd67nt47cty78bn65c+-*4-t").getBytes()
+  );
 
   public String generate(String subject, Map<String, Object> claims) {
     Instant now = Instant.now();
