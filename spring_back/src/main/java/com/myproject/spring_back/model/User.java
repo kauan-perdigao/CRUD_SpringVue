@@ -15,10 +15,8 @@ public class User {
 
   private String role = "USER";
 
-  // Constructors
   public User() {}
 
-  // Getters and Setters
   public Long getId() { return id; }
   public void setId(Long id) { this.id = id; }
 
@@ -33,4 +31,5 @@ public class User {
 
   public String getRole() { return role; }
   public void setRole(String role) { this.role = role; }
+  
 }
