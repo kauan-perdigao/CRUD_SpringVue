@@ -19,7 +19,7 @@ Um CRUD completo para gerenciar **Produtos** e **Categorias**, com **backend em 
 
 ---
 
-## 📊 Endpoints da API busca em tempo real)
+## 📊 Endpoints da API (busca em tempo real)
 - 📄 **Paginação** de resultados (5, 10 ou 20 itens por página)
 - 💰 **Formatação de preços** em Real (R$)
 - 🏷️ **Associação** produto-categoria
