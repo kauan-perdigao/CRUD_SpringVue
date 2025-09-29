@@ -37,6 +37,10 @@ const filtered = computed(() => {
     return campos.some(c => norm(c).includes(q))
   })
 })
+
+function onClear() {
+  search.value = ''
+}
 </script>
 
 <template>
@@ -47,6 +51,7 @@ const filtered = computed(() => {
       placeholder="Busque por ID, Nome, Preço ou Categoria…"
       prepend-inner-icon="mdi-magnify"
       clearable
+      @click:clear="onClear"
       class="mb-4"
     />
     <v-data-table

@@ -31,6 +31,10 @@ const filtered = computed(() => {
     norm(String(c.id ?? '')).includes(q) || norm(c.name ?? '').includes(q),
   )
 })
+
+function onClear() {
+  search.value = ''
+}
 </script>
 
 <template>
@@ -41,6 +45,7 @@ const filtered = computed(() => {
       placeholder="Busque por ID ou Nome…"
       prepend-inner-icon="mdi-magnify"
       clearable
+      @click:clear="onClear"
       class="mb-4"
     />
     <v-data-table
