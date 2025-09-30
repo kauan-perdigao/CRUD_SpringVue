@@ -4,6 +4,8 @@ import com.myproject.spring_back.model.Category;
 import com.myproject.spring_back.model.Product;
 import com.myproject.spring_back.repository.CategoryRepository;
 import com.myproject.spring_back.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,10 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
     
+    public Page<Category> findAll(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
+    }
+    
     public Optional<Category> findById(Long id) {
         return categoryRepository.findById(id);
     }
@@ -35,12 +41,14 @@ public class CategoryService {
     
     @Transactional
     public void deleteById(Long id) {
-        
         List<Product> productsToUpdate = productRepository.findByCategoryId(id);
-        for (Product product : productsToUpdate) {
-            product.setCategory(null);
-        }
-        productRepository.saveAll(productsToUpdate);
+        
+        // Usando stream API otimizada do Java 21
+        var updatedProducts = productsToUpdate.stream()
+            .peek(product -> product.setCategory(null))
+            .toList();
+            
+        productRepository.saveAll(updatedProducts);
         categoryRepository.deleteById(id);
     }
     
@@ -62,6 +70,10 @@ public class CategoryService {
 
     public List<Category> searchByName(String q) {
         return categoryRepository.findByNameContainingIgnoreCase(q);
+    }
+    
+    public Page<Category> searchByName(String q, Pageable pageable) {
+        return categoryRepository.findByNameContainingIgnoreCase(q, pageable);
     }
 
 }

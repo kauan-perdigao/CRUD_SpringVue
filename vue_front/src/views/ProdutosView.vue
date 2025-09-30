@@ -10,6 +10,7 @@ const produtos = ref<Produto[]>([])
 const categorias = ref<Categoria[]>([])
 const carregando = ref(false)
 const erro = ref<string | null>(null)
+const sucesso = ref<string | null>(null)
 
 const dialog = ref(false)
 const editando = ref(false)
@@ -26,7 +27,7 @@ async function carregar() {
     produtos.value = ps
     categorias.value = cs
   } catch (e) {
-    erro.value = 'Falha ao carregar produtos/categorias.'
+    erro.value = 'Falha ao carregar produtos.'
     console.error(e)
   } finally {
     carregando.value = false
@@ -63,13 +64,17 @@ async function salvar() {
     const id = formModel.value.id
     if (editando.value && id !== null) {
       await atualizarProduto(id, payload)
+      sucesso.value = 'Produto atualizado com sucesso!'
     } else {
       await criarProduto(payload)
+      sucesso.value = 'Produto criado com sucesso!'
     }
+    erro.value = null // Limpa erros anteriores
     await carregar()
     fechar()
   } catch (e) {
     erro.value = 'Erro ao salvar o produto. Nome precisa ser único dentro da categoria.'
+    sucesso.value = null // Limpa sucessos anteriores
     console.error(e)
   }
 }
@@ -77,8 +82,17 @@ async function salvar() {
 async function confirmarExcluir(p: Produto) {
   if (!p.id) return
   if (confirm(`Excluir o produto "${p.name}"?`)) {
-    try { await excluirProduto(p.id); await carregar() }
-    catch (e) { erro.value = 'Não foi possível excluir o produto.'; console.error(e) }
+    try { 
+      await excluirProduto(p.id)
+      sucesso.value = `Produto "${p.name}" excluído com sucesso!`
+      erro.value = null
+      await carregar()
+    }
+    catch (e) { 
+      erro.value = 'Não foi possível excluir o produto.'
+      sucesso.value = null
+      console.error(e) 
+    }
   }
 }
 
@@ -95,7 +109,8 @@ onMounted(carregar)
     <v-divider />
 
     <v-card-text>
-      <v-alert v-if="erro" type="error" closable class="mb-4">{{ erro }}</v-alert>
+      <v-alert v-if="erro" type="error" closable class="mb-4" @click:close="erro = null">{{ erro }}</v-alert>
+      <v-alert v-if="sucesso" type="success" closable class="mb-4" @click:close="sucesso = null">{{ sucesso }}</v-alert>
 
       <ProdutoTable
         :items="produtos"

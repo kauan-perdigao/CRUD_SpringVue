@@ -3,6 +3,8 @@ package com.myproject.spring_back.service;
 import com.myproject.spring_back.model.Product;
 import com.myproject.spring_back.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +19,16 @@ public class ProductService {
         return productRepository.findAllWithCategory();
     }
     
+    public Page<Product> findAllWithCategory(Pageable pageable) {
+        return productRepository.findAllWithCategory(pageable);
+    }
+    
     public List<Product> findAll() {
         return productRepository.findAll();
+    }
+    
+    public Page<Product> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
     
     public Optional<Product> findById(Long id) {
@@ -44,6 +54,10 @@ public class ProductService {
     public List<Product> findByCategoryId(Long categoryId) {
         return productRepository.findByCategoryId(categoryId);
     }
+    
+    public Page<Product> findByCategoryId(Long categoryId, Pageable pageable) {
+        return productRepository.findByCategoryId(categoryId, pageable);
+    }
 
     public boolean existsByName(String name) {
         return productRepository.existsByName(name);
@@ -59,6 +73,10 @@ public class ProductService {
 
     public List<Product> searchByName(String q) {
         return productRepository.findByNameContainingIgnoreCase(q);
+    }
+    
+    public Page<Product> searchByName(String q, Pageable pageable) {
+        return productRepository.findByNameContainingIgnoreCase(q, pageable);
     }
     
 }

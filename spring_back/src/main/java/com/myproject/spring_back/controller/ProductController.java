@@ -5,6 +5,8 @@ import com.myproject.spring_back.model.Category;
 import com.myproject.spring_back.service.ProductService;
 import com.myproject.spring_back.service.CategoryService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,47 +24,50 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<?> listar(@RequestParam(value = "q", required = false) String q) {
-        if (q == null || q.isBlank()) {
-            return ResponseEntity.ok(productService.findAllWithCategory());
+    public ResponseEntity<?> listar(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "paginated", required = false, defaultValue = "false") boolean paginated,
+            @PageableDefault(size = 7, sort = "name") Pageable pageable) {
+        
+        var filterType = determineFilterType(q, categoryId);
+        
+        if (paginated) {
+            return switch (filterType) {
+                case "category" -> ResponseEntity.ok(productService.findByCategoryId(categoryId, pageable));
+                case "search" -> ResponseEntity.ok(productService.searchByName(q, pageable));
+                case "all" -> ResponseEntity.ok(productService.findAllWithCategory(pageable));
+                default -> ResponseEntity.badRequest().build();
+            };
+        } else {
+            return switch (filterType) {
+                case "category" -> ResponseEntity.ok(productService.findByCategoryId(categoryId));
+                case "search" -> ResponseEntity.ok(productService.searchByName(q));
+                case "all" -> ResponseEntity.ok(productService.findAllWithCategory());
+                default -> ResponseEntity.badRequest().build();
+            };
         }
-        return ResponseEntity.ok(productService.searchByName(q));
+    }
+    
+    private String determineFilterType(String q, Long categoryId) {
+        if (categoryId != null) return "category";
+        if (q != null && !q.isBlank()) return "search";
+        return "all";
     }
 
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody Product produto) {
-    
-        if (productService.existsByNameAndCategoryId(produto.getName(), produto.getCategory().getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Já existe um produto com este nome nesta categoria.");
+        
+        var validationResult = validateProduct(produto);
+        if (validationResult != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult);
         }
 
-        if (produto.getPrice() == null || produto.getPrice().doubleValue() <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Preço deve ser maior que zero");
-        }
+        var categoria = categoryService.findById(produto.getCategory().getId())
+            .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        produto.setCategory(categoria);
 
-        if (produto.getName() == null || produto.getName().trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Nome do produto é obrigatório");
-        }
-
-        if (produto.getCategory() != null && produto.getCategory().getId() != null) {
-            if (!categoryService.existsById(produto.getCategory().getId())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Categoria não encontrada");
-            }
-            Category categoria = categoryService.findById(produto.getCategory().getId()).get();
-            produto.setCategory(categoria);
-        } else {
-            produto.setCategory(null);
-        }
-
-        if (produto.getCategory() == null || produto.getCategory().getId() == null) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Categoria é obrigatória");
-    }
-
-        Product produtoSalvo = productService.save(produto);
+        var produtoSalvo = productService.save(produto);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo);
     }
 
@@ -117,5 +122,24 @@ public class ProductController {
         }
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    private String validateProduct(Product produto) {
+        if (produto.getName() == null || produto.getName().trim().isEmpty()) {
+            return "Nome do produto é obrigatório";
+        }
+        if (produto.getPrice() == null || produto.getPrice().doubleValue() <= 0) {
+            return "Preço deve ser maior que zero";
+        }
+        if (produto.getCategory() == null || produto.getCategory().getId() == null) {
+            return "Categoria é obrigatória";
+        }
+        if (!categoryService.existsById(produto.getCategory().getId())) {
+            return "Categoria não encontrada";
+        }
+        if (productService.existsByNameAndCategoryId(produto.getName(), produto.getCategory().getId())) {
+            return "Já existe um produto com este nome nesta categoria";
+        }
+        return null;
     }
 }

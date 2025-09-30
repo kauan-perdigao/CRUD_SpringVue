@@ -8,6 +8,7 @@ import { listarCategorias, criarCategoria, atualizarCategoria, excluirCategoria 
 const categorias = ref<Categoria[]>([])
 const carregando = ref(false)
 const erro = ref<string | null>(null)
+const sucesso = ref<string | null>(null)
 
 const dialog = ref(false)
 const editando = ref(false)
@@ -50,13 +51,17 @@ async function salvar() {
     const data = formRef.value!.data()
     if (editando.value && data.id !== null) {
       await atualizarCategoria(data.id, { name: data.name })
+      sucesso.value = 'Categoria atualizada com sucesso!'
     } else {
       await criarCategoria({ name: data.name })
+      sucesso.value = 'Categoria criada com sucesso!'
     }
+    erro.value = null // Limpa erros anteriores
     await carregar()
     fechar()
   } catch (e) {
     erro.value = 'Erro ao salvar a categoria. Verifique se o nome é único.'
+    sucesso.value = null // Limpa sucessos anteriores
     console.error(e)
   }
 }
@@ -66,9 +71,12 @@ async function confirmarExcluir(item: Categoria) {
   if (confirm(`Excluir a categoria "${item.name}"?`)) {
     try {
       await excluirCategoria(item.id)
+      sucesso.value = `Categoria "${item.name}" excluída com sucesso!`
+      erro.value = null
       await carregar()
     } catch (e) {
       erro.value = 'Não foi possível excluir. Há produtos usando esta categoria?'
+      sucesso.value = null
       console.error(e)
     }
   }
@@ -87,7 +95,8 @@ onMounted(carregar)
     <v-divider />
 
     <v-card-text>
-      <v-alert v-if="erro" type="error" closable class="mb-4">{{ erro }}</v-alert>
+      <v-alert v-if="erro" type="error" closable class="mb-4" @click:close="erro = null">{{ erro }}</v-alert>
+      <v-alert v-if="sucesso" type="success" closable class="mb-4" @click:close="sucesso = null">{{ sucesso }}</v-alert>
 
       <CategoriaTable
         :items="categorias"
