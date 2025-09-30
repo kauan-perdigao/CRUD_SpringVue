@@ -9,8 +9,10 @@ import { listarCategorias } from '@/services/categorias'
 const produtos = ref<Produto[]>([])
 const categorias = ref<Categoria[]>([])
 const carregando = ref(false)
-const erro = ref<string | null>(null)
-const sucesso = ref<string | null>(null)
+
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+const snackbarColor = ref('success')
 
 const dialog = ref(false)
 const editando = ref(false)
@@ -21,15 +23,20 @@ const formRef = ref<InstanceType<typeof ProdutoForm> | null>(null)
 const confirmDialog = ref(false)
 const produtoParaExcluir = ref<Produto | null>(null)
 
+function mostrarMensagem(mensagem: string, cor: 'success' | 'error' = 'success') {
+  snackbarMessage.value = mensagem
+  snackbarColor.value = cor
+  snackbar.value = true
+}
+
 async function carregar() {
   try {
     carregando.value = true
-    erro.value = null
     const [ps, cs] = await Promise.all([listarProdutos(), listarCategorias()])
     produtos.value = ps
     categorias.value = cs
   } catch (e) {
-    erro.value = 'Falha ao carregar produtos.'
+    mostrarMensagem('Falha ao carregar produtos.', 'error')
     console.error(e)
   } finally {
     carregando.value = false
@@ -66,17 +73,15 @@ async function salvar() {
     const id = formModel.value.id
     if (editando.value && id !== null) {
       await atualizarProduto(id, payload)
-      sucesso.value = 'Produto atualizado com sucesso!'
+      mostrarMensagem('Produto atualizado com sucesso!')
     } else {
       await criarProduto(payload)
-      sucesso.value = 'Produto criado com sucesso!'
+      mostrarMensagem('Produto criado com sucesso!')
     }
-    erro.value = null
     await carregar()
     fechar()
   } catch (e) {
-    erro.value = 'Erro ao salvar o produto. Nome precisa ser único dentro da categoria.'
-    sucesso.value = null 
+    mostrarMensagem('Erro ao salvar o produto. Nome precisa ser único dentro da categoria.', 'error')
     console.error(e)
   }
 }
@@ -92,13 +97,11 @@ async function excluir() {
   
   try { 
     await excluirProduto(produto.id)
-    sucesso.value = `Produto "${produto.name}" foi excluído com sucesso!`
-    erro.value = null
+    mostrarMensagem(`Produto "${produto.name}" foi excluído com sucesso!`)
     await carregar()
   }
   catch (e) { 
-    erro.value = 'Não foi possível excluir o produto.'
-    sucesso.value = null
+    mostrarMensagem('Não foi possível excluir o produto.', 'error')
     console.error(e) 
   } finally {
     confirmDialog.value = false
@@ -119,8 +122,7 @@ onMounted(carregar)
     <v-divider />
 
     <v-card-text>
-      <v-alert v-if="erro" type="error" closable class="mb-4" @click:close="erro = null">{{ erro }}</v-alert>
-      <v-alert v-if="sucesso" type="success" closable class="mb-4" @click:close="sucesso = null">{{ sucesso }}</v-alert>
+
 
       <ProdutoTable
         :items="produtos"
@@ -198,4 +200,25 @@ onMounted(carregar)
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-snackbar
+    v-model="snackbar"
+    :color="snackbarColor"
+    timeout="4000"
+    location="bottom center"
+    class="font-weight-medium"
+  >
+    <v-icon start size="20">
+      {{ snackbarColor === 'success' ? 'mdi-check-circle' : 'mdi-alert-circle' }}
+    </v-icon>
+    {{ snackbarMessage }}
+    
+    <template v-slot:actions>
+      <v-btn
+        icon="mdi-close"
+        size="small"
+        @click="snackbar = false"
+      ></v-btn>
+    </template>
+  </v-snackbar>
 </template>
