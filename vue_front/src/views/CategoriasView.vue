@@ -15,6 +15,9 @@ const editando = ref(false)
 const formModel = ref<{ id: number | null; name: string }>({ id: null, name: '' })
 const formRef = ref<InstanceType<typeof CategoriaForm> | null>(null)
 
+const confirmDialog = ref(false)
+const categoriaParaExcluir = ref<Categoria | null>(null)
+
 async function carregar() {
   try {
     carregando.value = true
@@ -56,29 +59,37 @@ async function salvar() {
       await criarCategoria({ name: data.name })
       sucesso.value = 'Categoria criada com sucesso!'
     }
-    erro.value = null // Limpa erros anteriores
+    erro.value = null 
     await carregar()
     fechar()
   } catch (e) {
     erro.value = 'Erro ao salvar a categoria. Verifique se o nome é único.'
-    sucesso.value = null // Limpa sucessos anteriores
+    sucesso.value = null 
     console.error(e)
   }
 }
 
-async function confirmarExcluir(item: Categoria) {
-  if (!item.id) return
-  if (confirm(`Excluir a categoria "${item.name}"?`)) {
-    try {
-      await excluirCategoria(item.id)
-      sucesso.value = `Categoria "${item.name}" excluída com sucesso!`
-      erro.value = null
-      await carregar()
-    } catch (e) {
-      erro.value = 'Não foi possível excluir. Há produtos usando esta categoria?'
-      sucesso.value = null
-      console.error(e)
-    }
+function confirmarExcluir(item: Categoria) {
+  categoriaParaExcluir.value = item
+  confirmDialog.value = true
+}
+
+async function excluir() {
+  const categoria = categoriaParaExcluir.value
+  if (!categoria?.id) return
+  
+  try {
+    await excluirCategoria(categoria.id)
+    sucesso.value = `Categoria "${categoria.name}" foi excluída com sucesso!`
+    erro.value = null
+    await carregar()
+  } catch (e) {
+    erro.value = 'Não foi possível excluir. Há produtos usando esta categoria?'
+    sucesso.value = null
+    console.error(e)
+  } finally {
+    confirmDialog.value = false
+    categoriaParaExcluir.value = null
   }
 }
 
@@ -117,6 +128,74 @@ onMounted(carregar)
         <v-spacer />
         <v-btn variant="text" @click="fechar">Cancelar</v-btn>
         <v-btn color="primary" @click="salvar">Salvar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Diálogo de Confirmação de Exclusão -->
+  <v-dialog v-model="confirmDialog" max-width="500" persistent>
+    <v-card class="text-center pa-4">
+      <v-card-text>
+        <div class="mb-4">
+          <v-avatar size="64" color="error" class="mb-3">
+            <v-icon size="32" color="white">mdi-tag-remove-outline</v-icon>
+          </v-avatar>
+        </div>
+        
+        <h3 class="text-h6 mb-2">Confirmar Exclusão</h3>
+        
+        <p class="text-body-1 text-medium-emphasis mb-4">
+          Tem certeza que deseja excluir a categoria
+          <strong class="text-error">"{{ categoriaParaExcluir?.name }}"</strong>?
+        </p>
+        
+        <v-alert
+          type="warning"
+          variant="tonal"
+          class="text-left mb-4"
+          density="compact"
+        >
+          <template #prepend>
+            <v-icon>mdi-alert-outline</v-icon>
+          </template>
+          Esta ação não poderá ser desfeita.
+        </v-alert>
+
+        <v-alert
+          type="warning"
+          variant="tonal"
+          class="text-left mb-4"
+          density="compact"
+        >
+          <template #prepend>
+            <v-icon>mdi-alert-outline</v-icon>
+          </template>
+          Produtos vinculados a esta categoria ficarão sem categoria.
+        </v-alert>
+
+      </v-card-text>
+      
+      <v-card-actions class="justify-center pa-4">
+        <v-btn
+          variant="outlined"
+          color="grey"
+          size="large"
+          @click="confirmDialog = false; categoriaParaExcluir = null"
+          class="px-6"
+        >
+          <v-icon start>mdi-close</v-icon>
+          Cancelar
+        </v-btn>
+        
+        <v-btn
+          color="error"
+          size="large"
+          @click="excluir"
+          class="px-6 ml-3"
+        >
+          <v-icon start>mdi-tag-remove</v-icon>
+          Excluir
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

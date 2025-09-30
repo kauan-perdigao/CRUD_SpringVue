@@ -18,6 +18,8 @@ const formModel = ref<{ id: number | null; name: string; price: number; category
   id: null, name: '', price: 0, categoryId: null,
 })
 const formRef = ref<InstanceType<typeof ProdutoForm> | null>(null)
+const confirmDialog = ref(false)
+const produtoParaExcluir = ref<Produto | null>(null)
 
 async function carregar() {
   try {
@@ -69,30 +71,38 @@ async function salvar() {
       await criarProduto(payload)
       sucesso.value = 'Produto criado com sucesso!'
     }
-    erro.value = null // Limpa erros anteriores
+    erro.value = null
     await carregar()
     fechar()
   } catch (e) {
     erro.value = 'Erro ao salvar o produto. Nome precisa ser único dentro da categoria.'
-    sucesso.value = null // Limpa sucessos anteriores
+    sucesso.value = null 
     console.error(e)
   }
 }
 
-async function confirmarExcluir(p: Produto) {
-  if (!p.id) return
-  if (confirm(`Excluir o produto "${p.name}"?`)) {
-    try { 
-      await excluirProduto(p.id)
-      sucesso.value = `Produto "${p.name}" excluído com sucesso!`
-      erro.value = null
-      await carregar()
-    }
-    catch (e) { 
-      erro.value = 'Não foi possível excluir o produto.'
-      sucesso.value = null
-      console.error(e) 
-    }
+function confirmarExcluir(p: Produto) {
+  produtoParaExcluir.value = p
+  confirmDialog.value = true
+}
+
+async function excluir() {
+  const produto = produtoParaExcluir.value
+  if (!produto?.id) return
+  
+  try { 
+    await excluirProduto(produto.id)
+    sucesso.value = `Produto "${produto.name}" foi excluído com sucesso!`
+    erro.value = null
+    await carregar()
+  }
+  catch (e) { 
+    erro.value = 'Não foi possível excluir o produto.'
+    sucesso.value = null
+    console.error(e) 
+  } finally {
+    confirmDialog.value = false
+    produtoParaExcluir.value = null
   }
 }
 
@@ -131,6 +141,60 @@ onMounted(carregar)
         <v-spacer />
         <v-btn variant="text" @click="fechar">Cancelar</v-btn>
         <v-btn color="primary" @click="salvar">Salvar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="confirmDialog" max-width="500" persistent>
+    <v-card class="text-center pa-4">
+      <v-card-text>
+        <div class="mb-4">
+          <v-avatar size="64" color="error" class="mb-3">
+            <v-icon size="32" color="white">mdi-delete-outline</v-icon>
+          </v-avatar>
+        </div>
+        
+        <h3 class="text-h6 mb-2">Confirmar Exclusão</h3>
+        
+        <p class="text-body-1 text-medium-emphasis mb-4">
+          Tem certeza que deseja excluir o produto
+          <strong class="text-error">"{{ produtoParaExcluir?.name }}"</strong>?
+        </p>
+        
+        <v-alert
+          type="warning"
+          variant="tonal"
+          class="text-left mb-4"
+          density="compact"
+        >
+          <template #prepend>
+            <v-icon>mdi-alert-outline</v-icon>
+          </template>
+          Esta ação não poderá ser desfeita.
+        </v-alert>
+      </v-card-text>
+      
+      <v-card-actions class="justify-center pa-4">
+        <v-btn
+          variant="outlined"
+          color="grey"
+          size="large"
+          @click="confirmDialog = false; produtoParaExcluir = null"
+          class="px-6"
+        >
+          <v-icon start>mdi-close</v-icon>
+          Cancelar
+        </v-btn>
+        
+        <v-btn
+          color="error"
+          size="large"
+          @click="excluir"
+          class="px-6 ml-3"
+        >
+          <v-icon start>mdi-delete</v-icon>
+          Excluir
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
