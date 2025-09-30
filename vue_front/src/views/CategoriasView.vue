@@ -100,7 +100,7 @@ onMounted(carregar)
   <v-card>
     <v-card-title class="d-flex align-center justify-space-between">
       <span>Categorias</span>
-      <v-btn color="primary" @click="abrirCriar"><v-icon icon="mdi-plus" /> Nova</v-btn>
+      <v-btn color="primary" @click="abrirCriar"><v-icon icon="mdi-plus" /> Nova Categoria </v-btn>
     </v-card-title>
 
     <v-divider />

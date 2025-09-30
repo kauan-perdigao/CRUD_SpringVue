@@ -113,7 +113,7 @@ onMounted(carregar)
   <v-card>
     <v-card-title class="d-flex align-center justify-space-between">
       <span>Produtos</span>
-      <v-btn color="primary" @click="abrirCriar"><v-icon icon="mdi-plus" /> Novo</v-btn>
+      <v-btn color="primary" @click="abrirCriar"><v-icon icon="mdi-plus" /> Novo Produto </v-btn>
     </v-card-title>
 
     <v-divider />

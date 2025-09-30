@@ -4,7 +4,9 @@ import com.myproject.spring_back.model.Category;
 import com.myproject.spring_back.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private static final int MAX_PAGE_SIZE = 200; 
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
@@ -24,28 +27,36 @@ public class CategoryController {
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "paginated", required = false, defaultValue = "false") boolean paginated,
             @PageableDefault(size = 7, sort = "name") Pageable pageable) {
-        
+
         if (paginated) {
-            var page = (q == null || q.isBlank()) 
-                ? categoryService.findAll(pageable)
-                : categoryService.searchByName(q, pageable);
+            Pageable effectivePageable = enforcePageableLimits(pageable);
+            var page = (q == null || q.isBlank())
+                ? categoryService.findAll(effectivePageable)
+                : categoryService.searchByName(q.trim(), effectivePageable);
             return ResponseEntity.ok(page);
         } else {
-            var result = (q == null || q.isBlank()) 
+            var result = (q == null || q.isBlank())
                 ? categoryService.findAll()
-                : categoryService.searchByName(q);
+                : categoryService.searchByName(q.trim());
             return ResponseEntity.ok(result);
         }
     }
 
+    private Pageable enforcePageableLimits(Pageable pageable) {
+        int size = Math.max(1, Math.min(pageable.getPageSize(), MAX_PAGE_SIZE));
+        int page = Math.max(0, pageable.getPageNumber());
+        Sort sort = pageable.getSort();
+        return PageRequest.of(page, size, sort);
+    }
+
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody Category categoria) {
-        
+
         if (categoryService.existsByName(categoria.getName())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Já existe uma categoria com este nome");
         }
-        
+
         Category categoriaSalva = categoryService.save(categoria);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
     }
@@ -63,9 +74,9 @@ public class CategoryController {
 
         Category categoria = categoryService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada com id: " + id));
-        
+
         categoria.setName(categoriaDetalhes.getName());
-        
+
         Category categoriaAtualizada = categoryService.save(categoria);
         return ResponseEntity.ok(categoriaAtualizada);
     }
@@ -75,9 +86,9 @@ public class CategoryController {
         if (!categoryService.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        
-        categoryService.deleteById(id); 
-        
+
+        categoryService.deleteById(id);
+
         return ResponseEntity.noContent().build();
     }
 }

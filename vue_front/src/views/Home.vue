@@ -19,10 +19,18 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="primary" :to="{ path: '/produtos' }">
-              Ir para Produtos
-              <v-icon end>mdi-arrow-right</v-icon>
-            </v-btn>
+            <v-card 
+              color="blue" 
+              variant="flat" 
+              class="pa-3 cursor-pointer"
+              @click="$router.push('/produtos')"
+              hover
+            >
+              <div class="text-white text-center">
+                IR PARA PRODUTOS
+                <v-icon end>mdi-arrow-right</v-icon>
+              </div>
+            </v-card>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -38,13 +46,33 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="primary" :to="{ path: '/categorias' }">
-              Ir para Categorias
-              <v-icon end>mdi-arrow-right</v-icon>
-            </v-btn>
+            <v-card 
+              color="blue" 
+              variant="flat" 
+              class="pa-3 cursor-pointer"
+              @click="$router.push('/categorias')"
+              hover
+            >
+              <div class="text-white text-center">
+                IR PARA CATEGORIAS
+                <v-icon end>mdi-arrow-right</v-icon>
+              </div>
+            </v-card>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.cursor-pointer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+</style>

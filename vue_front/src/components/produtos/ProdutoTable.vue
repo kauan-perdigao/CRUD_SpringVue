@@ -19,7 +19,7 @@ function norm(s: string) {
 const headers = [
   { title: 'ID', value: 'id', width: 80 },
   { title: 'Nome', value: 'name' },
-  { title: 'Preço', value: 'price' },
+  { title: 'Preço (R$)', value: 'price' },
   { title: 'Categoria', value: 'category' },
   { title: 'Ações', value: 'actions', sortable: false, align: 'end' as const, width: 120 },
 ]
