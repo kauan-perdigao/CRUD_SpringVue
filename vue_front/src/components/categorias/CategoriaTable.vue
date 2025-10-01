@@ -13,7 +13,7 @@ const emit = defineEmits<{
 }>()
 
 const search = ref('')
-const itemsPerPage = ref(5)
+const itemsPerPage = ref(10)
 const currentPage = ref(1)
 const itemsPerPageOptions = [
   { value: 5, title: '5' },
