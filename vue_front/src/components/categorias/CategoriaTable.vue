@@ -13,7 +13,7 @@ const emit = defineEmits<{
 }>()
 
 const search = ref('')
-const itemsPerPage = ref(10)
+const itemsPerPage = ref(5)
 const currentPage = ref(1)
 const itemsPerPageOptions = [
   { value: 5, title: '5' },
@@ -103,8 +103,7 @@ function onClear() {
           v-model="currentPage"
           :length="totalPages"
           :total-visible="7"
-          size="small"
-          show-first-last-page
+          size="big"
         ></v-pagination>
       </div>
     </div>
