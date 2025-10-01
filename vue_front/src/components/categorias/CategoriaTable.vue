@@ -13,7 +13,8 @@ const emit = defineEmits<{
 }>()
 
 const search = ref('')
-const itemsPerPage = ref(5)
+const itemsPerPage = ref(10)
+const currentPage = ref(1)
 const itemsPerPageOptions = [
   { value: 5, title: '5' },
   { value: 10, title: '10' },
@@ -40,8 +41,30 @@ const filtered = computed(() => {
   )
 })
 
+const totalPages = computed(() => {
+  if (itemsPerPage.value === -1) return 1
+  return Math.ceil(filtered.value.length / itemsPerPage.value)
+})
+
+const paginatedItems = computed(() => {
+  if (itemsPerPage.value === -1) return filtered.value
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filtered.value.slice(start, end)
+})
+
+function getPageInfo(): string {
+  if (filtered.value.length === 0) return '0 de 0'
+  if (itemsPerPage.value === -1) return `1-${filtered.value.length} de ${filtered.value.length}`
+  
+  const start = (currentPage.value - 1) * itemsPerPage.value + 1
+  const end = Math.min(currentPage.value * itemsPerPage.value, filtered.value.length)
+  return `${start}-${end} de ${filtered.value.length}`
+}
+
 function onClear() {
   search.value = ''
+  currentPage.value = 1
 }
 </script>
 
@@ -56,16 +79,42 @@ function onClear() {
       @click:clear="onClear"
       class="mb-4"
     />
+
+    <div class="mb-4">
+      <div class="d-flex justify-space-between align-center mb-3">
+        <div class="d-flex align-center">
+          <span class="text-body-2 mr-4">Itens por página:</span>
+          <v-select
+            v-model="itemsPerPage"
+            :items="itemsPerPageOptions"
+            density="compact"
+            variant="outlined"
+            hide-details
+            style="max-width: 100px;"
+          ></v-select>
+        </div>
+        <div class="text-body-2">
+          {{ getPageInfo() }}
+        </div>
+      </div>
+      
+      <div class="d-flex justify-center" v-if="totalPages > 1">
+        <v-pagination
+          v-model="currentPage"
+          :length="totalPages"
+          :total-visible="7"
+          size="small"
+          show-first-last-page
+        ></v-pagination>
+      </div>
+    </div>
+
     <v-data-table
       :headers="headers"
-      :items="filtered"
+      :items="paginatedItems"
       :loading="loading"
       item-key="id"
-      :items-per-page="itemsPerPage"
-      :items-per-page-options="itemsPerPageOptions"
-      :items-per-page-text="'Itens por página:'"
-      show-current-page
-      page-text="{0}-{1} de {2}"
+      hide-default-footer
       :no-data-text="'Nenhuma categoria encontrada'"
       :loading-text="'Carregando categorias...'"
     >
@@ -74,5 +123,6 @@ function onClear() {
         <v-btn size="small" color="error" icon="mdi-delete" @click="emit('delete', item)"></v-btn>
       </template>
     </v-data-table>
+
   </div>
 </template>
