@@ -13,6 +13,14 @@ const emit = defineEmits<{
 }>()
 
 const search = ref('')
+const itemsPerPage = ref(5)
+const itemsPerPageOptions = [
+  { value: 5, title: '5' },
+  { value: 10, title: '10' },
+  { value: 25, title: '25' },
+  { value: 50, title: '50' },
+  { value: -1, title: 'Todos' }
+]
 
 function norm(s: string) {
   return s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
@@ -53,6 +61,13 @@ function onClear() {
       :items="filtered"
       :loading="loading"
       item-key="id"
+      :items-per-page="itemsPerPage"
+      :items-per-page-options="itemsPerPageOptions"
+      :items-per-page-text="'Itens por página:'"
+      show-current-page
+      page-text="{0}-{1} de {2}"
+      :no-data-text="'Nenhuma categoria encontrada'"
+      :loading-text="'Carregando categorias...'"
     >
       <template #item.actions="{ item }">
         <v-btn size="small" icon="mdi-pencil" @click="emit('edit', item)"></v-btn>

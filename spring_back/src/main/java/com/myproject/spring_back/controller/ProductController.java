@@ -20,7 +20,7 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
 
-    private static final int MAX_PAGE_SIZE = 200; // ajuste conforme necessidade
+    private static final int MAX_PAGE_SIZE = 50;
 
     public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
@@ -32,7 +32,7 @@ public class ProductController {
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "paginated", required = false, defaultValue = "false") boolean paginated,
-            @PageableDefault(size = 7, sort = "name") Pageable pageable) {
+            @PageableDefault(size = 5, sort = "name") Pageable pageable) {
 
         var filterType = determineFilterType(q, categoryId);
 

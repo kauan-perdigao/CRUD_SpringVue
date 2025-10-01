@@ -6,7 +6,7 @@ export interface Categoria {
 export interface Produto {
   id: number | null
   name: string
-  price: number
+  price: string
   category: Categoria | null
 }
 

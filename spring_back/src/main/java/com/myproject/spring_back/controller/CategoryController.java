@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
 
     private final CategoryService categoryService;
-    private static final int MAX_PAGE_SIZE = 200; 
+    private static final int MAX_PAGE_SIZE = 50; 
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
@@ -26,7 +26,7 @@ public class CategoryController {
     public ResponseEntity<?> listar(
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "paginated", required = false, defaultValue = "false") boolean paginated,
-            @PageableDefault(size = 7, sort = "name") Pageable pageable) {
+            @PageableDefault(size = 5, sort = "name") Pageable pageable) {
 
         if (paginated) {
             Pageable effectivePageable = enforcePageableLimits(pageable);

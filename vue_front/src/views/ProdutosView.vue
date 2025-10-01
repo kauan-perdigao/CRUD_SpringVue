@@ -16,8 +16,8 @@ const snackbarColor = ref('success')
 
 const dialog = ref(false)
 const editando = ref(false)
-const formModel = ref<{ id: number | null; name: string; price: number; categoryId: number | null }>({
-  id: null, name: '', price: 0, categoryId: null,
+const formModel = ref<{ id: number | null; name: string; price: string; categoryId: number | null }>({
+  id: null, name: '', price: '', categoryId: null,
 })
 const formRef = ref<InstanceType<typeof ProdutoForm> | null>(null)
 const confirmDialog = ref(false)
@@ -48,19 +48,19 @@ function toPayload(): ProdutoPayload {
   const cat = categorias.value.find(c => c.id === d.categoryId) ?? null
   return {
     name: d.name,
-    price: d.price,
+    price: Number(d.price),
     category: cat ? { id: cat.id, name: cat.name } : null,
   }
 }
 
 function abrirCriar() {
   editando.value = false
-  formModel.value = { id: null, name: '', price: 0, categoryId: null }
+  formModel.value = { id: null, name: '', price: '', categoryId: null }
   dialog.value = true
 }
 function abrirEditar(p: Produto) {
   editando.value = true
-  formModel.value = { id: p.id, name: p.name, price: Number(p.price), categoryId: p.category?.id ?? null }
+  formModel.value = { id: p.id, name: p.name, price: String(p.price), categoryId: p.category?.id ?? null }
   dialog.value = true
 }
 function fechar() { dialog.value = false }
